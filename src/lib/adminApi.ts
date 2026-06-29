@@ -8,6 +8,7 @@ export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
+  accessRevoked?: boolean;
 }
 
 export interface AdminCourse {
@@ -23,6 +24,14 @@ export interface AdminCourse {
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  role: UserRole;
+  accessRevoked: boolean;
+  createdAt: string;
 }
 
 async function adminRequest<T>(
@@ -55,6 +64,36 @@ async function adminRequest<T>(
 
 export function fetchAuthUser(token: string) {
   return adminRequest<{ user: AuthUser }>("/api/auth/me", token);
+}
+
+export function portalSignIn(
+  email: string,
+  password: string,
+  portal: "public" | "admin"
+) {
+  return loginRequest<{
+    session: { access_token: string; refresh_token: string };
+    user: AuthUser;
+  }>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password, portal }),
+  });
+}
+
+async function loginRequest<T>(path: string, init: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init.headers ?? {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Invalid email or password.");
+  }
+
+  return response.json() as Promise<T>;
 }
 
 export function fetchAdminCourses(token: string) {
@@ -106,5 +145,20 @@ export function updateAdminCourse(
 export function deleteAdminCourse(token: string, id: number) {
   return adminRequest<void>(`/api/admin/courses/${id}`, token, {
     method: "DELETE",
+  });
+}
+
+export function fetchAdminUsers(token: string) {
+  return adminRequest<{ users: AdminUser[] }>("/api/admin/users", token);
+}
+
+export function updateAdminUserAccess(
+  token: string,
+  id: string,
+  input: { accessRevoked?: boolean; role?: UserRole }
+) {
+  return adminRequest<{ user: AdminUser }>(`/api/admin/users/${id}`, token, {
+    method: "PATCH",
+    body: JSON.stringify(input),
   });
 }

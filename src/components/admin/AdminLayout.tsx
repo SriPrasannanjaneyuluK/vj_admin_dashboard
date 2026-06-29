@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { LogOut, Plus, LayoutDashboard } from "lucide-react";
+import { LogOut, Plus, LayoutDashboard, Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Logo } from "@/components/layout/Logo";
 import { STATIC_SITE } from "@/lib/staticSite";
@@ -56,7 +56,14 @@ export function AdminLayout() {
             className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:border-accent/30 hover:text-accent"
           >
             <LayoutDashboard size={16} />
-            Dashboard
+            Courses
+          </Link>
+          <Link
+            to="/users"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:border-accent/30 hover:text-accent"
+          >
+            <Users size={16} />
+            User access
           </Link>
           <Link
             to="/courses/new"

@@ -6,8 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { fetchAuthUser, type AuthUser } from "@/lib/adminApi";
-import { PORTAL_ACCESS_DENIED } from "@/lib/authMessages";
+import { fetchAuthUser, portalSignIn, type AuthUser } from "@/lib/adminApi";
+import { INVALID_CREDENTIALS } from "@/lib/authMessages";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 interface AuthContextValue {
@@ -33,6 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const applyAdminSession = async (token: string, profile: AuthUser) => {
+    if (profile.accessRevoked) {
+      if (supabase) await supabase.auth.signOut();
+      setUser(null);
+      setAccessToken(null);
+      return false;
+    }
+
     if (profile.role !== "admin") {
       if (supabase) await supabase.auth.signOut();
       setUser(null);
@@ -105,28 +112,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     signInInProgress.current = true;
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { session, user: profile } = await portalSignIn(email, password, "admin");
 
-      if (error) throw error;
-      if (!data.session?.access_token) {
-        throw new Error("No session returned");
-      }
-
-      const token = data.session.access_token;
-      const profile = await fetchProfile(token);
-
-      if (profile.role !== "admin") {
-        await supabase.auth.signOut();
-        setUser(null);
-        setAccessToken(null);
-        throw new Error(PORTAL_ACCESS_DENIED);
-      }
+      const { error } = await supabase.auth.setSession(session);
+      if (error) throw new Error(INVALID_CREDENTIALS);
 
       setUser(profile);
-      setAccessToken(token);
+      setAccessToken(session.access_token);
       return profile;
     } finally {
       signInInProgress.current = false;
