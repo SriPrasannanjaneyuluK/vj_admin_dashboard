@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { LogIn } from "lucide-react";
-import { useAuth, isSupabaseConfigured } from "@/context/AuthContext";
+import { useAuth, isApiConfigured } from "@/context/AuthContext";
 import { Logo } from "@/components/layout/Logo";
 import { STATIC_SITE } from "@/lib/staticSite";
 import { toSignInError } from "@/lib/authMessages";
@@ -40,9 +40,9 @@ export function AdminLoginPage() {
           <p className="mt-2 text-sm text-muted">{STATIC_SITE.name}</p>
         </div>
 
-        {!isSupabaseConfigured && (
+        {!isApiConfigured && (
           <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-            Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to vi_ai_forge_admin/.env
+            Add VITE_API_URL to vi_ai_forge_admin/.env
           </p>
         )}
 
@@ -81,7 +81,7 @@ export function AdminLoginPage() {
 
           <button
             type="submit"
-            disabled={submitting || !isSupabaseConfigured}
+            disabled={submitting || !isApiConfigured}
             className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             <LogIn size={16} />

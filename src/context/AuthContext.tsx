@@ -2,13 +2,18 @@ import {
   createContext,
   useContext,
   useEffect,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
-import { fetchAuthUser, portalSignIn, type AuthUser } from "@/lib/adminApi";
-import { INVALID_CREDENTIALS } from "@/lib/authMessages";
-import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import {
+  fetchAuthUser,
+  isApiConfigured,
+  portalLogout,
+  portalSignIn,
+  refreshAccessToken,
+  setAccessToken,
+  type AuthUser,
+} from "@/lib/adminApi";
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -23,9 +28,8 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessTokenState] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const signInInProgress = useRef(false);
 
   const fetchProfile = async (token: string) => {
     const { user: profile } = await fetchAuthUser(token);
@@ -34,21 +38,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const applyAdminSession = async (token: string, profile: AuthUser) => {
     if (profile.accessRevoked) {
-      if (supabase) await supabase.auth.signOut();
-      setUser(null);
+      await portalLogout().catch(() => undefined);
       setAccessToken(null);
+      setAccessTokenState(null);
+      setUser(null);
       return false;
     }
 
     if (profile.role !== "admin") {
-      if (supabase) await supabase.auth.signOut();
-      setUser(null);
+      await portalLogout().catch(() => undefined);
       setAccessToken(null);
+      setAccessTokenState(null);
+      setUser(null);
       return false;
     }
 
-    setUser(profile);
     setAccessToken(token);
+    setAccessTokenState(token);
+    setUser(profile);
     return true;
   };
 
@@ -57,24 +64,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const profile = await fetchProfile(token);
       await applyAdminSession(token, profile);
     } catch {
-      setUser(null);
       setAccessToken(null);
+      setAccessTokenState(null);
+      setUser(null);
     }
   };
 
   useEffect(() => {
-    const client = supabase;
-    if (!client) {
+    if (!isApiConfigured) {
       setLoading(false);
       return;
     }
 
     let cancelled = false;
 
-    client.auth.getSession().then(async ({ data }) => {
+    (async () => {
+      const token = await refreshAccessToken();
       if (cancelled) return;
 
-      const token = data.session?.access_token;
       if (!token) {
         setLoading(false);
         return;
@@ -82,55 +89,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       await restoreSession(token);
       if (!cancelled) setLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = client.auth.onAuthStateChange(async (_event, session) => {
-      if (signInInProgress.current) return;
-
-      const token = session?.access_token;
-      if (!token) {
-        setUser(null);
-        setAccessToken(null);
-        return;
-      }
-
-      await restoreSession(token);
-    });
+    })();
 
     return () => {
       cancelled = true;
-      subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    if (!supabase) {
-      throw new Error("Supabase is not configured");
+    if (!isApiConfigured) {
+      throw new Error("API is not configured");
     }
 
-    signInInProgress.current = true;
-    try {
-      const { session, user: profile } = await portalSignIn(email, password, "admin");
-
-      const { error } = await supabase.auth.setSession(session);
-      if (error) throw new Error(INVALID_CREDENTIALS);
-
-      setUser(profile);
-      setAccessToken(session.access_token);
-      return profile;
-    } finally {
-      signInInProgress.current = false;
-    }
+    const { access_token, user: profile } = await portalSignIn(email, password, "admin");
+    setAccessToken(access_token);
+    setAccessTokenState(access_token);
+    setUser(profile);
+    return profile;
   };
 
   const signOut = async () => {
-    if (supabase) {
-      await supabase.auth.signOut();
-    }
-    setUser(null);
+    await portalLogout().catch(() => undefined);
     setAccessToken(null);
+    setAccessTokenState(null);
+    setUser(null);
   };
 
   return (
@@ -157,4 +139,4 @@ export function useAuth() {
   return context;
 }
 
-export { isSupabaseConfigured };
+export { isApiConfigured };

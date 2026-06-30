@@ -1,4 +1,10 @@
 import type { CourseFormValues } from "@/lib/courseForm";
+import {
+  apiFetch,
+  isApiConfigured,
+  refreshAccessToken,
+  setAccessToken,
+} from "@/lib/authSession";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
@@ -34,19 +40,24 @@ export interface AdminUser {
   createdAt: string;
 }
 
+export { isApiConfigured, refreshAccessToken, setAccessToken };
+
 async function adminRequest<T>(
   path: string,
   token: string,
   init?: RequestInit
 ): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...init?.headers,
+  const response = await apiFetch(
+    path,
+    {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...init?.headers,
+      },
     },
-  });
+    token
+  );
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
@@ -72,7 +83,7 @@ export function portalSignIn(
   portal: "public" | "admin"
 ) {
   return loginRequest<{
-    session: { access_token: string; refresh_token: string };
+    access_token: string;
     user: AuthUser;
   }>("/api/auth/login", {
     method: "POST",
@@ -80,9 +91,16 @@ export function portalSignIn(
   });
 }
 
+export function portalLogout() {
+  return loginRequest<{ ok: true }>("/api/auth/logout", {
+    method: "POST",
+  });
+}
+
 async function loginRequest<T>(path: string, init: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(init.headers ?? {}),
