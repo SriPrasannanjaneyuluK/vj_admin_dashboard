@@ -23,6 +23,11 @@ export async function refreshAccessToken(): Promise<string | null> {
         credentials: "include",
       });
 
+      if (response.status === 204) {
+        accessToken = null;
+        return null;
+      }
+
       if (!response.ok) {
         accessToken = null;
         return null;
