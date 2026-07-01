@@ -1,0 +1,17 @@
+# Render Blueprint — admin portal static site (vi_ai_forge_admin)
+# https://render.com/docs/redirects-rewrites
+#
+# If the service already exists in the dashboard, either:
+# 1. Link this blueprint on deploy, or
+# 2. Add the same rule manually: Redirects/Rewrites → Source /* → /index.html → Rewrite
+
+services:
+  - type: web
+    name: vi-ai-forge-admin
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
