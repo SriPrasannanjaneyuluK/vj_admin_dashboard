@@ -40,6 +40,14 @@ export interface AdminUser {
   createdAt: string;
 }
 
+export interface AdminContactSubmission {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+}
+
 export { isApiConfigured, refreshAccessToken, setAccessToken };
 
 async function adminRequest<T>(
@@ -179,4 +187,11 @@ export function updateAdminUserAccess(
     method: "PATCH",
     body: JSON.stringify(input),
   });
+}
+
+export function fetchAdminContactSubmissions(token: string) {
+  return adminRequest<{ submissions: AdminContactSubmission[] }>(
+    "/api/admin/contact",
+    token
+  );
 }

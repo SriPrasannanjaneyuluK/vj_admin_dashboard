@@ -67,7 +67,7 @@ export function CourseForm() {
           ? "Course published! It is now live on the public site."
           : "Course saved as draft."
       );
-      setTimeout(() => navigate("/"), 1200);
+      setTimeout(() => navigate("/courses"), 1200);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save course");
     } finally {

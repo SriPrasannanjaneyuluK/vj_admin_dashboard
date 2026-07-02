@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   fetchAdminUsers,
@@ -78,6 +80,14 @@ export function AdminUsersPage() {
 
   return (
     <FadeInItem>
+      <Link
+        to="/"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted hover:text-accent transition-colors"
+      >
+        <ArrowLeft size={16} />
+        Dashboard
+      </Link>
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">User access</h1>
         <p className="mt-2 text-sm text-muted max-w-2xl">
