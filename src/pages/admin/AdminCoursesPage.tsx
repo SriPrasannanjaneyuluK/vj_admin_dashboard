@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Plus, Eye, EyeOff, Trash2, ArrowLeft, Pencil } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   deleteAdminCourse,
   fetchAdminCourses,
-  updateAdminCourse,
+  patchAdminCourse,
   type AdminCourse,
 } from "@/lib/adminApi";
+import { FadeInItem } from "@/components/motion/FadeIn";
 
-export function AdminDashboardPage() {
+export function AdminCoursesPage() {
   const { accessToken } = useAuth();
   const [courses, setCourses] = useState<AdminCourse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +37,7 @@ export function AdminDashboardPage() {
   const togglePublish = async (course: AdminCourse) => {
     if (!accessToken) return;
     try {
-      await updateAdminCourse(accessToken, course.id, {
+      await patchAdminCourse(accessToken, course.id, {
         isPublished: !course.isPublished,
       });
       await loadCourses();
@@ -57,7 +58,15 @@ export function AdminDashboardPage() {
   };
 
   return (
-    <div>
+    <FadeInItem>
+      <Link
+        to="/"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted hover:text-accent transition-colors"
+      >
+        <ArrowLeft size={16} />
+        Dashboard
+      </Link>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Course management</h1>
@@ -95,7 +104,7 @@ export function AdminDashboardPage() {
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-border">
+        <div className="overflow-x-auto rounded-2xl border border-border bg-white">
           <table className="w-full text-sm">
             <thead className="bg-muted/30 text-left">
               <tr>
@@ -125,7 +134,13 @@ export function AdminDashboardPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Link
+                        to={`/courses/${course.id}/edit`}
+                        className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs hover:bg-muted/30"
+                      >
+                        <Pencil size={14} /> Edit
+                      </Link>
                       <button
                         type="button"
                         onClick={() => togglePublish(course)}
@@ -156,6 +171,6 @@ export function AdminDashboardPage() {
           </table>
         </div>
       )}
-    </div>
+    </FadeInItem>
   );
 }

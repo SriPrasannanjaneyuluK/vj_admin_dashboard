@@ -16,6 +16,7 @@ export function CoursePreviewPanel({ values }: CoursePreviewPanelProps) {
     duration: values.duration,
     icon: values.icon,
     tag: values.tag,
+    cardImageUrl: values.cardImageUrl || null,
   };
 
   return (
