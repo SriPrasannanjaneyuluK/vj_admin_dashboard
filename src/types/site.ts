@@ -35,6 +35,7 @@ export interface Course {
   duration: string;
   icon: CourseIcon;
   tag: string;
+  cardImageUrl: string | null;
 }
 
 export interface Founder {

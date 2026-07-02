@@ -1,6 +1,15 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
+type FadeInStaggerProps = {
+  children: ReactNode;
+  className?: string;
+};
+
+export function FadeInStagger({ children, className }: FadeInStaggerProps) {
+  return <div className={className}>{children}</div>;
+}
+
 type FadeInItemProps = {
   children: ReactNode;
   delay?: number;
