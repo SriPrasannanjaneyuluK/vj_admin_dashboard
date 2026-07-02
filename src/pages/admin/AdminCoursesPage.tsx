@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Eye, EyeOff, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Eye, EyeOff, Trash2, ArrowLeft, Pencil } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   deleteAdminCourse,
   fetchAdminCourses,
-  updateAdminCourse,
+  patchAdminCourse,
   type AdminCourse,
 } from "@/lib/adminApi";
 import { FadeInItem } from "@/components/motion/FadeIn";
@@ -37,7 +37,7 @@ export function AdminCoursesPage() {
   const togglePublish = async (course: AdminCourse) => {
     if (!accessToken) return;
     try {
-      await updateAdminCourse(accessToken, course.id, {
+      await patchAdminCourse(accessToken, course.id, {
         isPublished: !course.isPublished,
       });
       await loadCourses();
@@ -134,7 +134,13 @@ export function AdminCoursesPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Link
+                        to={`/courses/${course.id}/edit`}
+                        className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs hover:bg-muted/30"
+                      >
+                        <Pencil size={14} /> Edit
+                      </Link>
                       <button
                         type="button"
                         onClick={() => togglePublish(course)}

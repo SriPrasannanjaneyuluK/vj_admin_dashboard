@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, Mail, Users, ArrowRight } from "lucide-react";
+import { BookOpen, CalendarCheck, Mail, Users, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { FadeInItem, FadeInStagger } from "@/components/motion/FadeIn";
 
@@ -9,6 +9,12 @@ const ACTIONS = [
     description: "Create, publish, and manage courses on the public site.",
     to: "/courses",
     icon: BookOpen,
+  },
+  {
+    title: "Demo bookings",
+    description: "View student demo reservations and update attendance status.",
+    to: "/demo-bookings",
+    icon: CalendarCheck,
   },
   {
     title: "User access",
@@ -42,7 +48,7 @@ export function AdminHomePage() {
         </div>
       </FadeInItem>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {ACTIONS.map(({ title, description, to, icon: Icon }) => (
           <FadeInItem key={to}>
             <Link

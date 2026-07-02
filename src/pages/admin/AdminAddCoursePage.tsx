@@ -13,7 +13,7 @@ export function AdminAddCoursePage() {
         <ArrowLeft size={16} />
         Back to courses
       </Link>
-      <CourseForm />
+      <CourseForm mode="create" />
     </FadeInItem>
   );
 }

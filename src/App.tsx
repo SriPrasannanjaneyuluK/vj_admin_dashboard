@@ -5,6 +5,8 @@ import { AdminHomePage } from "@/pages/admin/AdminHomePage";
 import { AdminCoursesPage } from "@/pages/admin/AdminCoursesPage";
 import { AdminAddCoursePage } from "@/pages/admin/AdminAddCoursePage";
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
+import { AdminEditCoursePage } from "@/pages/admin/AdminEditCoursePage";
+import { AdminDemoBookingsPage } from "@/pages/admin/AdminDemoBookingsPage";
 import { AdminContactPage } from "@/pages/admin/AdminContactPage";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminRoute } from "@/components/admin/AdminRoute";
@@ -20,6 +22,8 @@ export default function App() {
               <Route index element={<AdminHomePage />} />
               <Route path="courses" element={<AdminCoursesPage />} />
               <Route path="courses/new" element={<AdminAddCoursePage />} />
+              <Route path="courses/:id/edit" element={<AdminEditCoursePage />} />
+              <Route path="demo-bookings" element={<AdminDemoBookingsPage />} />
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="contact" element={<AdminContactPage />} />
             </Route>
