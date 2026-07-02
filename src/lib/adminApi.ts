@@ -57,6 +57,7 @@ export interface AdminCourse {
     discount?: string;
     scholarship?: string;
   } | null;
+  showFeeStructure: boolean;
 }
 
 export interface AdminDemoSession {

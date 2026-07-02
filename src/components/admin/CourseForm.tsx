@@ -287,6 +287,24 @@ export function CourseForm({ mode, courseId, initialValues }: CourseFormProps) {
 
         {tab === "pricing" && (
           <div className="space-y-4">
+            <label className="flex items-start gap-3 rounded-xl border border-border bg-muted/20 p-4 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-1 rounded border-border"
+                checked={values.showFeeStructure}
+                onChange={(e) => update("showFeeStructure", e.target.checked)}
+              />
+              <span>
+                <span className="block text-sm font-medium text-foreground">
+                  Show fee on course page
+                </span>
+                <span className="block text-xs text-muted mt-1">
+                  When off, learners see a friendly note that a tutor will explain fees after the demo.
+                </span>
+              </span>
+            </label>
+
+            <div className={values.showFeeStructure ? "space-y-4" : "space-y-4 opacity-60 pointer-events-none"}>
             <Field label="Fee type">
               <select className={fieldClass} value={values.fee.type} onChange={(e) => update("fee", { ...values.fee, type: e.target.value as "one_time" | "emi" })}>
                 <option value="one_time">One-time fee</option>
@@ -315,6 +333,7 @@ export function CourseForm({ mode, courseId, initialValues }: CourseFormProps) {
             <Field label="Scholarship message">
               <input className={fieldClass} value={values.fee.scholarship} onChange={(e) => update("fee", { ...values.fee, scholarship: e.target.value })} />
             </Field>
+            </div>
           </div>
         )}
 

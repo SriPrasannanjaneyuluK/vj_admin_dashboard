@@ -58,6 +58,7 @@ export interface CourseFormValues {
   projects: ProjectForm[];
   careers: CareerForm[];
   fee: FeeStructureForm;
+  showFeeStructure: boolean;
 }
 
 export const EMPTY_FEE: FeeStructureForm = {
@@ -101,6 +102,7 @@ export const EMPTY_COURSE_FORM: CourseFormValues = {
   projects: [],
   careers: [],
   fee: { ...EMPTY_FEE },
+  showFeeStructure: true,
 };
 
 export interface CourseTemplate {
@@ -218,6 +220,7 @@ export function adminCourseToForm(course: AdminCourse): CourseFormValues {
       discount: course.feeStructure?.discount ?? "",
       scholarship: course.feeStructure?.scholarship ?? "",
     },
+    showFeeStructure: course.showFeeStructure !== false,
   };
 }
 
@@ -269,5 +272,6 @@ export function formToApiPayload(values: CourseFormValues, publish: boolean) {
       discount: values.fee.discount || undefined,
       scholarship: values.fee.scholarship || undefined,
     },
+    showFeeStructure: values.showFeeStructure,
   };
 }
